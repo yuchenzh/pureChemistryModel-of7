@@ -15,9 +15,10 @@ chemistryType
     solver          ode;
     method          pure; //key line
 }
-```
+
 
 optimizedODE  true;
+```
 
 in **system/controlDict**
 
