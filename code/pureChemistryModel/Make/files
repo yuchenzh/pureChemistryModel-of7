@@ -1,0 +1,6 @@
+pureChemistryModel/BasicChemistryModels.C
+
+pureChemistrySolver/makeChemistrySolvers.C
+
+
+LIB = $(FOAM_USER_LIBBIN)/libpureChemistryModel

@@ -1,0 +1,132 @@
+
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  7
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version         2;
+    format          ascii;
+    class           dictionary;
+    location        "constant";
+    object          chemistryProperties;
+}
+
+
+chemistryType
+{
+    solver          ode;
+    method          pure; // chemistryModel (CCMP2P in OpenFOAM 7)
+}
+
+chemistry       on;
+
+log             off;
+
+initialChemicalTimeStep 1e-7;
+
+odeCoeffs
+{
+    solver          seulex;
+    absTol          1e-08;
+    relTol          0.1;
+}
+
+importantSpecies
+{
+    CO2             ;
+    H2O             ;
+    CH4             ;
+    O2              ;
+}
+
+optimizedODE  true;
+
+CCM
+{
+//================= New CCM settings =====================//
+    // You can select whatever number of PVs
+    // as you like!
+    principalVars ("T" "CH3OH" "HO2" "H2O2" "CH4" "CH2OH" "C" "CH2" "HCO" "HCCO" "OH" "O" "CH3O");
+    //principalVars ("chi" "phieq" "J" "T" "CH3OH" "HO2" "H2O2" "CH4" "CH2OH" "C" "CH2" "HCO" "HCCO" "OH" "O" "CH3O");
+    //principalVars ("T" "chi" "phieq" "J" "CH4");
+    //principalVars ("T" "phieq");
+    nSlice                50;
+    ignoreMin            1e-6;
+    ratioOxygenToCarbonElementInFuel 0;
+
+    // Logarithmic pressure encoding
+    // If enabled, pressure will be encoded in log scale: ln(P)
+    // This provides better resolution for pressure variations
+    // Note: Pressure is NOT included in principalVars when using this option
+    highMach              true;  // Enable for testing
+
+    // Optimized ODE solver using FastChemistryModel
+    // Set to false to use OpenFOAM native implementation
+    // Set to true to use AVX2-optimized FastChemistryModel
+    optimizedODE          true;  // Default: false (can change to true to test optimization)
+
+    // if more than 256/512/1024 cores, try distributed and set the localCores to be 128
+    communicator
+    {
+        mode           global; // global, distributed
+        localCores     6;
+    }
+
+    // Error Control Variables (ecVars) mode
+    ecMode
+    {
+        enabled         true;          // Enable EC mode
+        numECVarsToAdd   3;            // Conservative: add 3 variables when update
+        numECVarsToRemove 1;           // Aggressive: remove 5 variables when update
+        updateFreq      5;             // Check every 5 steps
+    }
+
+
+    // Communication optimization
+    optimizedCommunication true;  // true: use targeted distribution, false: use broadcast  
+
+    // Timing analysis switch
+    debugTime            true;  // true: enable detailed timing analysis for the 9 major steps  
+
+    // // Switches for debug
+    debugMode            false;
+    examineYdiff         false; // must have debugMode enabled
+    shutdownImmediately  false;  // must have debugMode/shutdownImmediately enabled
+
+
+    // // deprecated usage
+    pvInfo
+    {
+        // T         (300 2200   5);
+        // chi       (0    300   150);
+        // phieq     (0      5   0.01);
+        // J         (0   0.06   0.005);
+        // CH4       (0    0.2   0.001);
+    }
+    // You will use H atom to calculate J
+    JElement        "h";
+    
+    // You will use Jh to calculate 
+    // the scalar dissipation rate '\chi'
+    chiComponent    "Jh";// Jc, Jh, Jn, Jo
+
+    // oldStyleChi = exp(-grad(phi)*grad(phi))
+    // newStyleChi = 2D grad(Z)*grad(Z)
+        oldStyleChi      false; 
+
+    // oldStylePhi: equivalence ratio that will not change during the combustion process
+    // newStylePhi: equivalence ratio that will change during the combustion process
+        oldStylePhi      false;
+
+}
+
+
+
+
+#include "reactions";
+
+// ************************************************************************* //
