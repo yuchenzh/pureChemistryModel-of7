@@ -649,6 +649,12 @@ void OptReaction::readInfo
         const word reactionTypeName = nthreaction.lookup("type");
         Foam::string reactionName = nthreaction.lookup("reaction");
 
+        // DEBUG OUTPUT
+        Info << "DEBUG: Reading reaction #" << this->n_Reactions << endl;
+        Info << "DEBUG: Reaction name: " << key << endl;
+        Info << "DEBUG: Reaction type: " << reactionTypeName << endl;
+        Info << "DEBUG: Reaction equation: " << reactionName << endl;
+
         this->n_Reactions++;
 
         if(reactionTypeName == "irreversibleArrhenius" || 
@@ -758,13 +764,23 @@ void OptReaction::readInfo
         }
     }
 
+    // DEBUG: Print reaction type summary
+    Info << "DEBUG: ========== REACTION TYPE SUMMARY ==========" << endl;
+    Info << "DEBUG: Total reactions read: " << this->n_Reactions << endl;
+    Info << "DEBUG: n_Arrhenius: " << this->n_Arrhenius << endl;
+    Info << "DEBUG: n_ThirdBodyReaction: " << this->n_ThirdBodyReaction << endl;
+    Info << "DEBUG: n_Fall_Off_Reaction: " << this->n_Fall_Off_Reaction << endl;
+    Info << "DEBUG: n_ChemicallyActivated_Reaction: " << this->n_ChemicallyActivated_Reaction << endl;
+    Info << "DEBUG: n_PlogReaction: " << this->n_PlogReaction << endl;
+    Info << "DEBUG: ===========================================" << endl;
+
     {
         this->Itbr[0] = 0;
         this->Itbr[1] = this->n_NonEquilibriumThirdBodyReaction;
         this->Itbr[2] = this->Itbr[1] + this->n_ThirdBodyReaction;
-        this->Itbr[3] = this->Itbr[2] + this->n_Fall_Off_Reaction;   
-        this->Itbr[4] = this->Itbr[3] + this->n_ChemicallyActivated_Reaction;       
-        this->Itbr[5] = this->Itbr[4] + this->n_NonEquilibriumThirdBodyReaction; 
+        this->Itbr[3] = this->Itbr[2] + this->n_Fall_Off_Reaction;
+        this->Itbr[4] = this->Itbr[3] + this->n_ChemicallyActivated_Reaction;
+        this->Itbr[5] = this->Itbr[4] + this->n_NonEquilibriumThirdBodyReaction;
     }
 
     {
@@ -900,7 +916,9 @@ void OptReaction::readInfo
         if
         (
             reactionTypeName=="irreversibleArrhenius"||
-            reactionTypeName=="reversibleArrhenius"
+            reactionTypeName=="reversibleArrhenius"||
+            reactionTypeName=="irreversibleArrheniusReaction"||
+            reactionTypeName=="reversibleArrheniusReaction"
         )
         {
             auto a = readScalar(reactDict.lookup("beta"));
@@ -958,7 +976,9 @@ void OptReaction::readInfo
         if
         (
             reactionTypeName=="irreversibleArrhenius"||
-            reactionTypeName=="reversibleArrhenius"
+            reactionTypeName=="reversibleArrhenius"||
+            reactionTypeName=="irreversibleArrheniusReaction"||
+            reactionTypeName=="reversibleArrheniusReaction"
         )
         {
             auto a = readScalar(reactDict.lookup("beta"));
@@ -1013,7 +1033,8 @@ void OptReaction::readInfo
         const word reactionTypeName = reactDict.lookup("type");
         bool isInteger = this->checkInteger(reactDict);
 
-        if(reactionTypeName=="nonEquilibriumReversibleArrhenius")
+        if(reactionTypeName=="nonEquilibriumReversibleArrhenius"||
+            reactionTypeName=="nonEquilibriumReversibleArrheniusReaction")
         {
             this->isIrreversible[iArrhenius]=2;
             const dictionary& forwardDict = reactDict.subDict("forward");
@@ -1065,7 +1086,8 @@ void OptReaction::readInfo
         const word reactionTypeName = reactDict.lookup("type");
         bool isInteger = this->checkInteger(reactDict);
 
-        if(reactionTypeName=="nonEquilibriumReversibleThirdBodyArrhenius")
+        if(reactionTypeName=="nonEquilibriumReversibleThirdBodyArrhenius"||
+            reactionTypeName=="nonEquilibriumReversibleThirdBodyArrheniusReaction")
         {
             this->isIrreversible[iArrhenius]=2;
             const dictionary& forwardDict = reactDict.subDict("forward");
@@ -1142,7 +1164,9 @@ void OptReaction::readInfo
         if
         (
             reactionTypeName=="reversibleThirdBodyArrhenius"||
-            reactionTypeName=="irreversibleThirdBodyArrhenius"
+            reactionTypeName=="irreversibleThirdBodyArrhenius"||
+            reactionTypeName=="reversibleThirdBodyArrheniusReaction"||
+            reactionTypeName=="irreversibleThirdBodyArrheniusReaction"
         )
         {
             if(reactionTypeName.find("irreversible",0)!=std::string::npos)
@@ -1201,7 +1225,9 @@ void OptReaction::readInfo
         if
         (
             reactionTypeName=="reversibleArrheniusLindemannFallOff"||
-            reactionTypeName=="irreversibleArrheniusLindemannFallOff"
+            reactionTypeName=="irreversibleArrheniusLindemannFallOff"||
+            reactionTypeName=="reversibleArrheniusLindemannFallOffReaction"||
+            reactionTypeName=="irreversibleArrheniusLindemannFallOffReaction"
         )
         {
             if(reactionTypeName.find("irreversible",0)!=std::string::npos)
@@ -1271,7 +1297,9 @@ void OptReaction::readInfo
         if
         (
             reactionTypeName=="reversibleArrheniusTroeFallOff"||
-            reactionTypeName=="irreversibleArrheniusTroeFallOff"
+            reactionTypeName=="irreversibleArrheniusTroeFallOff"||
+            reactionTypeName=="reversibleArrheniusTroeFallOffReaction"||
+            reactionTypeName=="irreversibleArrheniusTroeFallOffReaction"
         )
         {
             if(reactionTypeName.find("irreversible",0)!=std::string::npos)
@@ -1346,7 +1374,9 @@ void OptReaction::readInfo
         if
         (
             reactionTypeName=="reversibleArrheniusSRIFallOff"||
-            reactionTypeName=="irreversibleArrheniusSRIFallOff"
+            reactionTypeName=="irreversibleArrheniusSRIFallOff"||
+            reactionTypeName=="reversibleArrheniusSRIFallOffReaction"||
+            reactionTypeName=="irreversibleArrheniusSRIFallOffReaction"
         )
         {
             if(reactionTypeName.find("irreversible",0)!=std::string::npos)
@@ -1423,7 +1453,9 @@ void OptReaction::readInfo
 
         if(
             reactionTypeName=="reversibleArrheniusLindemannChemicallyActivated"||
-            reactionTypeName=="irreversibleArrheniusLindemannChemicallyActivated"
+            reactionTypeName=="irreversibleArrheniusLindemannChemicallyActivated"||
+            reactionTypeName=="reversibleArrheniusLindemannChemicallyActivatedReaction"||
+            reactionTypeName=="irreversibleArrheniusLindemannChemicallyActivatedReaction"
         )
         {
             if(reactionTypeName.find("irreversible",0)!=std::string::npos)
@@ -1495,7 +1527,9 @@ void OptReaction::readInfo
 
         if(
             reactionTypeName=="reversibleArrheniusTroeChemicallyActivated"||
-            reactionTypeName=="irreversibleArrheniusTroeChemicallyActivated"
+            reactionTypeName=="irreversibleArrheniusTroeChemicallyActivated"||
+            reactionTypeName=="reversibleArrheniusTroeChemicallyActivatedReaction"||
+            reactionTypeName=="irreversibleArrheniusTroeChemicallyActivatedReaction"
         )
         {
             if(reactionTypeName.find("irreversible",0)!=std::string::npos)
@@ -1572,7 +1606,9 @@ void OptReaction::readInfo
 
         if(
             reactionTypeName=="reversibleArrheniusSRIChemicallyActivated" ||
-            reactionTypeName=="irreversibleArrheniusSRIChemicallyActivated" 
+            reactionTypeName=="irreversibleArrheniusSRIChemicallyActivated"||
+            reactionTypeName=="reversibleArrheniusSRIChemicallyActivatedReaction" ||
+            reactionTypeName=="irreversibleArrheniusSRIChemicallyActivatedReaction" 
         )
         {
             if(reactionTypeName.find("irreversible",0)!=std::string::npos)
@@ -1696,7 +1732,9 @@ void OptReaction::readInfo
         if
         (
             reactionTypeName=="reversibleArrheniusPLOG"||
-            reactionTypeName=="irreversibleArrheniusPLOG"
+            reactionTypeName=="irreversibleArrheniusPLOG"||
+            reactionTypeName=="reversibleArrheniusPLOGReaction"||
+            reactionTypeName=="irreversibleArrheniusPLOGReaction"
         )
         {
             if(reactionTypeName.find("irreversible",0)!=std::string::npos)

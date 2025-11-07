@@ -32,6 +32,6 @@ chemistryReader foamChemistryReader;
 foamChemistryFile "$FOAM_CASE/constant/reactionsGRI";
 foamChemistryThermoFile "$FOAM_CASE/constant/thermo.compressibleGasGRI";
 
-#include "thermos";
+#include "thermos2";
 
 // ************************************************************************* //
