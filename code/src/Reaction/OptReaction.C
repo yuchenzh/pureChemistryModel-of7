@@ -626,8 +626,8 @@ void OptReaction::readInfo
     const dictionary& physicalDict    
 )
 {
+    hashedWordList speciesTable(chemistryDict.lookup("species"));
 
-    hashedWordList speciesTable(physicalDict.lookup("species"));
 
     this->speciesTable_.resize(speciesTable.size());
     for(unsigned int i=0; i<this->speciesTable_.size();i++)
@@ -648,12 +648,6 @@ void OptReaction::readInfo
         const dictionary& nthreaction = reactions.subDict(key);
         const word reactionTypeName = nthreaction.lookup("type");
         Foam::string reactionName = nthreaction.lookup("reaction");
-
-        // DEBUG OUTPUT
-        Info << "DEBUG: Reading reaction #" << this->n_Reactions << endl;
-        Info << "DEBUG: Reaction name: " << key << endl;
-        Info << "DEBUG: Reaction type: " << reactionTypeName << endl;
-        Info << "DEBUG: Reaction equation: " << reactionName << endl;
 
         this->n_Reactions++;
 
@@ -681,8 +675,8 @@ void OptReaction::readInfo
         (
             reactionTypeName == "reversibleThirdBodyArrhenius"||
             reactionTypeName == "irreversibleThirdBodyArrhenius"||
-            reactionTypeName == "reversibleThirdBodyArrheniusReaction" ||
-            reactionTypeName == "irreversibleThirdBodyArrheniusReaction"
+            reactionTypeName == "reversiblethirdBodyArrheniusReaction" ||
+            reactionTypeName == "irreversiblethirdBodyArrheniusReaction"
         )
         {
             this->n_ThirdBodyReaction++;
@@ -763,16 +757,6 @@ void OptReaction::readInfo
                 << reactionTypeName << exit(FatalError);
         }
     }
-
-    // DEBUG: Print reaction type summary
-    Info << "DEBUG: ========== REACTION TYPE SUMMARY ==========" << endl;
-    Info << "DEBUG: Total reactions read: " << this->n_Reactions << endl;
-    Info << "DEBUG: n_Arrhenius: " << this->n_Arrhenius << endl;
-    Info << "DEBUG: n_ThirdBodyReaction: " << this->n_ThirdBodyReaction << endl;
-    Info << "DEBUG: n_Fall_Off_Reaction: " << this->n_Fall_Off_Reaction << endl;
-    Info << "DEBUG: n_ChemicallyActivated_Reaction: " << this->n_ChemicallyActivated_Reaction << endl;
-    Info << "DEBUG: n_PlogReaction: " << this->n_PlogReaction << endl;
-    Info << "DEBUG: ===========================================" << endl;
 
     {
         this->Itbr[0] = 0;

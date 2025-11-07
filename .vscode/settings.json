@@ -1,5 +1,8 @@
 {
     "files.associations": {
-        "OptReaction.C": "cpp"
+        "OptReaction.C": "cpp",
+        "pureChemistryModel.C": "cpp",
+        "FastChemistryModel.C": "cpp",
+        "token.C": "cpp"
     }
 }

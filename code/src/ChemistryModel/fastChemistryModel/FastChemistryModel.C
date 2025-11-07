@@ -106,7 +106,36 @@ Foam::FastChemistryModel::FastChemistryModel
         )
     );
 
-    hashedWordList speciesTable(thermoDict.lookup("species"));
+    const fileName foamChemistryFileName
+    (
+        thermoDict.lookup("foamChemistryFile")
+    );
+    fileName foamChemistryFilePath
+    (
+        foamChemistryFileName
+    );
+    foamChemistryFilePath.expand();
+
+    IFstream foamChemistryFileStream(foamChemistryFilePath);
+    IFstream foamChemistryFileStreamCopy(foamChemistryFilePath);
+    dictionary foamChemistryFileDict{foamChemistryFileStream};
+    dictionary foamChemistryFileDictCopy(foamChemistryFileStreamCopy);
+
+    const fileName foamChemistryThermoFileName
+    (
+        thermoDict.lookup("foamChemistryThermoFile")
+    );
+    fileName foamChemistryThermoFilePath
+    (
+        foamChemistryThermoFileName
+    );
+    foamChemistryThermoFilePath.expand();
+    IFstream foamChemistryThermoFileStream(foamChemistryThermoFilePath);
+    dictionary foamChemistryThermoFileDict(foamChemistryThermoFileStream);
+
+
+    hashedWordList speciesTable(foamChemistryFileDictCopy.lookupOrDefault("species",wordList()));
+
     nSpecie_ = speciesTable.size();
     RR_.setSize(nSpecie_);
     n_ = nSpecie_ + 1;
@@ -123,7 +152,7 @@ Foam::FastChemistryModel::FastChemistryModel
                     << "Index of default species is wrong!"
                     << Foam::abort(FatalError);
     }
-    reaction.readInfo(chemistryProperties,thermoDict);
+    reaction.readInfo(foamChemistryFileDict,foamChemistryThermoFileDict);
 
     // Create the fields for the chemistry sources
     // forAll(RR_, fieldi)
