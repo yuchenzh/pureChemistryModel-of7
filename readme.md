@@ -26,5 +26,5 @@ in **system/controlDict**
 libs ("libpureChemistryModel.so");
 ```
 
-
+### Should use OpenFOAM format kinetics!
 ### check the Sandia tutorial case for details!
